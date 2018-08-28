@@ -37,7 +37,7 @@ class Book(models.Model):
     price=models.DecimalField(max_digits=5,decimal_places=2)
 
     # 与Publish建立一对多的关系,外键字段建立在多的一方
-    publish=models.ForeignKey(to="Publish",to_field="nid",on_delete=models.CASCADE)
+    publish=models.ForeignKey(to="Publish",to_field="nid",on_delete=models.CASCADE, null=True, blank=True)
     # 与Author表建立多对多的关系,ManyToManyField可以建在两个模型中的任意一个，自动创建第三张表
     authors=models.ManyToManyField(to='Author',)
 

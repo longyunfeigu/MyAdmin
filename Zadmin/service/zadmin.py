@@ -4,6 +4,7 @@ from django.conf.urls import url
 from django.shortcuts import render
 
 class ZModelAdmin(object):
+    list_display = []
     def __init__(self, model, site):
         self.model = model
         self.site = site
@@ -11,9 +12,39 @@ class ZModelAdmin(object):
     def addView(self, request):
         return render(request, 'add_view.html')
 
+    def process_header(self):
+        header_list = []
+        if not self.list_display:
+            header_list.append(self.model._meta.model_name)
+            return header_list
+        for item in self.list_display:
+            if isinstance(item, str):
+                field = self.model._meta.get_field(item)
+                header_list.append(field.verbose_name)
+            else:
+                val = item(self, is_header=True)
+                header_list.append(val)
+        return header_list
+
     def listView(self, request):
         data_list = self.model.objects.all()
-        return render(request, 'list_view.html', {'data_list': data_list})
+        header_list = self.process_header()
+        model_name = self.model._meta.model_name
+        new_data_list = []
+        for obj in data_list:
+            dic = {}
+            if not self.list_display:
+                new_data_list.append(obj.__str__())
+                continue
+            for item in self.list_display:
+                if isinstance(item,str):
+                    val = getattr(obj, item)
+                else:
+                    val = item(self, obj)
+                dic[item] = val
+            new_data_list.append(dic)
+
+        return render(request, 'list_view.html', locals())
 
     def changeView(self, request,nid):
         return render(request, 'change_view.html')
@@ -30,6 +61,7 @@ class ZModelAdmin(object):
         return temp
 
 class ZAdminSite(object):
+
     def __init__(self):
         self._registry = {}
 

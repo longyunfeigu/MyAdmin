@@ -17,4 +17,4 @@
 2. 注册
 3. 设计urls
     二级url放到了ZModelAdmin，因为在这个类的对象里可以获取model
-    从而可以获取数据通过render渲染到html文件
+    
